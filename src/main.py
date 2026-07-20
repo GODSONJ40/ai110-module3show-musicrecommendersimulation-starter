@@ -9,11 +9,16 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+try:
+    # When run as a module from the project root: ``python -m src.main``
+    from src.recommender import load_songs, recommend_songs
+except ModuleNotFoundError:
+    # When run directly from inside the ``src`` directory: ``python main.py``
+    from recommender import load_songs, recommend_songs
 
 
 def main() -> None:
-    songs = load_songs("data/songs.csv") 
+    songs = load_songs("data/songs.csv")
 
     # Starter example profile
     user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}

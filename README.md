@@ -17,17 +17,26 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommenders (Spotify, YouTube, Netflix) learn from huge amounts of behavior data — what you play, skip, save, and finish — and combine that with audio and metadata signals to predict what you're likely to enjoy next. They mix *content-based* filtering (matching item features to your taste) with *collaborative* filtering (recommending what similar users liked). My version is a small, transparent, purely content-based recommender: instead of learning from behavior, it compares a user's stated taste profile directly against each song's features and ranks by how well they match. I prioritize **explainability and predictability** — every score should be traceable to a clear reason a person can read — over the scale and personalization that a real system would chase.
 
-Some prompts to answer:
+**Song features.** Each `Song` carries `genre`, `mood`, `energy`, `tempo_bpm`, `valence`, `danceability`, and `acousticness` (plus `id`, `title`, and `artist` for identity and display).
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+**User profile.** A `UserProfile` stores the user's `favorite_genre`, `favorite_mood`, a `target_energy` level, and a `likes_acoustic` flag.
 
-You can include a simple diagram or bullet list if helpful.
+**Scoring.** The `Recommender` computes a match score for each song by comparing the profile to the song's features:
+
+- Big boost when the song's `genre` matches `favorite_genre`
+- Boost when `mood` matches `favorite_mood`
+- Reward songs whose `energy` is close to `target_energy` (penalize the gap)
+- Nudge toward or away from acoustic tracks based on `likes_acoustic`
+
+**Choosing recommendations.** Score every song in the catalog, sort by score (highest first), and return the top `k`. Each recommendation ships with a short explanation of *why* it was picked (which features matched), so the ranking is never a black box.
+
+```text
+UserProfile ─┐
+             ├─▶ score_song(user, song) ─▶ (score, reasons) ─▶ sort desc ─▶ top k
+Song ────────┘
+```
 
 ---
 
